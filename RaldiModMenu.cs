@@ -1,14 +1,18 @@
 using BepInEx;
 using UnityEngine;
 
-[BepInPlugin("com.kristarune.raldimm", "Raldi Mod Menu", "1.0.0")]
+[BepInPlugin("com.kristarune.raldimm", "Raldi Big Mod Menu", "1.0.0")]
 public class RaldiModMenu : BaseUnityPlugin
 {
     private bool showMenu = false;
+
     private bool infStamina = false;
     private bool noclip = false;
     private bool godMode = false;
-    private float speedMult = 2f;
+    private bool infNotebooks = false;
+    private bool freezeNPCs = false;
+
+    private float speedMult = 3f;
 
     private PlayerScript player;
 
@@ -25,7 +29,8 @@ public class RaldiModMenu : BaseUnityPlugin
             if (infStamina)
                 player.stamina = player.maxStamina;
 
-            player.walkSpeed = player.normSpeed * speedMult;
+            if (player.normSpeed > 0)
+                player.walkSpeed = player.normSpeed * speedMult;
         }
     }
 
@@ -33,19 +38,28 @@ public class RaldiModMenu : BaseUnityPlugin
     {
         if (!showMenu) return;
 
-        GUILayout.BeginArea(new Rect(30, 30, 400, 550), GUI.skin.window);
-        GUILayout.Label("<b>Raldi's Crackhouse Mod Menu</b>\nPress Tab to toggle");
+        GUILayout.BeginArea(new Rect(20, 20, 500, 700), GUI.skin.window);
+        GUILayout.Label("<b>🔥 Raldi's Crackhouse BIG Mod Menu</b>\nPress Tab to Open/Close");
 
+        GUILayout.Space(15);
+        GUILayout.Label("=== Player Cheats ===");
         infStamina = GUILayout.Toggle(infStamina, "Infinite Stamina");
-        noclip = GUILayout.Toggle(noclip, "Noclip");
         godMode = GUILayout.Toggle(godMode, "God Mode");
+        noclip = GUILayout.Toggle(noclip, "Noclip");
 
-        GUILayout.Label($"Speed: {speedMult:F1}x");
-        speedMult = GUILayout.HorizontalSlider(speedMult, 0.5f, 30f);
+        GUILayout.Label($"Player Speed: {speedMult:F1}x");
+        speedMult = GUILayout.HorizontalSlider(speedMult, 0.5f, 50f);
 
-        if (GUILayout.Button("Give All Items")) Debug.Log("Give All Items");
-        if (GUILayout.Button("Teleport to Exit")) Debug.Log("Teleport");
-        if (GUILayout.Button("Freeze NPCs")) Debug.Log("Freeze NPCs");
+        GUILayout.Space(15);
+        GUILayout.Label("=== Game Cheats ===");
+        infNotebooks = GUILayout.Toggle(infNotebooks, "Infinite Notebooks");
+        freezeNPCs = GUILayout.Toggle(freezeNPCs, "Freeze All NPCs");
+
+        GUILayout.Space(15);
+        if (GUILayout.Button("Give All Items")) Debug.Log("[Mod] Give All Items");
+        if (GUILayout.Button("Teleport to Exit")) Debug.Log("[Mod] Teleport to Exit");
+        if (GUILayout.Button("Complete Level")) Debug.Log("[Mod] Complete Level");
+        if (GUILayout.Button("Spawn Item")) Debug.Log("[Mod] Spawn Item");
 
         GUILayout.EndArea();
     }
