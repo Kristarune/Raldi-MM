@@ -1,25 +1,45 @@
-name: Build Mod Menu
+name: Build Raldi Mod Menu
 
 on:
   push:
     branches: [ main ]
+  pull_request:
 
 jobs:
   build:
     runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v4
 
-    - name: Setup .NET
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Setup .NET SDK
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
 
-    - name: Build
-      run: dotnet build --configuration Release
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
 
-    - name: Upload DLL
+    - name: Restore Dependencies
+      run: dotnet restore
+
+    - name: Build Mod
+      run: dotnet build --configuration Release --no-restore -p:WarningLevel=0
+
+    - name: Upload Built DLL
       uses: actions/upload-artifact@v4
       with:
         name: RaldiModMenu
         path: bin/Release/net472/RaldiModMenu.dll
+        retention-days: 30
+
+    - name: Show Build Summary
+      run: |
+        echo "✅ Build finished!"
+        echo "📁 Check the Artifacts section below to download RaldiModMenu.dll"
