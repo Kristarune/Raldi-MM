@@ -9,8 +9,6 @@ public class RaldiModMenu : BaseUnityPlugin
     private bool infStamina = false;
     private bool noclip = false;
     private bool godMode = false;
-    private bool infNotebooks = false;
-    private bool freezeNPCs = false;
 
     private float speedMult = 3f;
 
@@ -29,8 +27,8 @@ public class RaldiModMenu : BaseUnityPlugin
             if (infStamina)
                 player.stamina = player.maxStamina;
 
-            if (player.normSpeed > 0)
-                player.walkSpeed = player.normSpeed * speedMult;
+            // Speed hack (safer version)
+            player.walkSpeed = 5f * speedMult;   // we'll adjust the base value later if needed
         }
     }
 
@@ -38,28 +36,21 @@ public class RaldiModMenu : BaseUnityPlugin
     {
         if (!showMenu) return;
 
-        GUILayout.BeginArea(new Rect(20, 20, 500, 700), GUI.skin.window);
-        GUILayout.Label("<b>🔥 Raldi's Crackhouse BIG Mod Menu</b>\nPress Tab to Open/Close");
+        GUILayout.BeginArea(new Rect(20, 20, 500, 650), GUI.skin.window);
+        GUILayout.Label("<b>🔥 Raldi's Crackhouse BIG Mod Menu</b>\nTab to toggle");
 
-        GUILayout.Space(15);
-        GUILayout.Label("=== Player Cheats ===");
+        GUILayout.Space(10);
         infStamina = GUILayout.Toggle(infStamina, "Infinite Stamina");
         godMode = GUILayout.Toggle(godMode, "God Mode");
         noclip = GUILayout.Toggle(noclip, "Noclip");
 
-        GUILayout.Label($"Player Speed: {speedMult:F1}x");
+        GUILayout.Label($"Speed: {speedMult:F1}x");
         speedMult = GUILayout.HorizontalSlider(speedMult, 0.5f, 50f);
 
         GUILayout.Space(15);
-        GUILayout.Label("=== Game Cheats ===");
-        infNotebooks = GUILayout.Toggle(infNotebooks, "Infinite Notebooks");
-        freezeNPCs = GUILayout.Toggle(freezeNPCs, "Freeze All NPCs");
-
-        GUILayout.Space(15);
         if (GUILayout.Button("Give All Items")) Debug.Log("[Mod] Give All Items");
-        if (GUILayout.Button("Teleport to Exit")) Debug.Log("[Mod] Teleport to Exit");
+        if (GUILayout.Button("Teleport to Exit")) Debug.Log("[Mod] Teleport");
         if (GUILayout.Button("Complete Level")) Debug.Log("[Mod] Complete Level");
-        if (GUILayout.Button("Spawn Item")) Debug.Log("[Mod] Spawn Item");
 
         GUILayout.EndArea();
     }
