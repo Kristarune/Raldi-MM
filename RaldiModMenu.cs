@@ -27,8 +27,10 @@ public class RaldiModMenu : BaseUnityPlugin
             if (infStamina)
                 player.stamina = player.maxStamina;
 
-            // Speed hack (safer version)
-            player.walkSpeed = 5f * speedMult;   // we'll adjust the base value later if needed
+            // Speed hack (using reflection because field name may vary)
+            var walkSpeedField = player.GetType().GetField("walkSpeed", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (walkSpeedField != null)
+                walkSpeedField.SetValue(player, 5f * speedMult);
         }
     }
 
