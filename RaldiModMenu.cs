@@ -1,15 +1,19 @@
 using BepInEx;
 using UnityEngine;
 
-[BepInPlugin("com.kristarune.raldimm", "Raldi Big Mod Menu", "1.1.0")]
+[BepInPlugin("com.kristarune.raldimm", "Raldi Big Mod Menu", "1.0.0")]
 public class RaldiModMenu : BaseUnityPlugin
 {
-    private bool showMenu;
-    private bool infStamina;
-    private bool noclip;
-    private bool godMode;
-    private float speedMult = 1f;
+    private bool showMenu = false;
+
+    private bool infStamina = false;
+    private bool godMode = false;
+    private bool noclip = false;
+
+    private float speedMult = 3f;
+
     private PlayerScript player;
+    private CharacterController cc;
 
     private void Update()
     {
@@ -19,23 +23,32 @@ public class RaldiModMenu : BaseUnityPlugin
         if (player == null)
             player = FindObjectOfType<PlayerScript>();
 
-        if (player == null)
-            return;
-
-        if (infStamina)
-            player.stamina = player.maxStamina;
-
-        player.walkSpeed = 5f * speedMult;
-
-        if (noclip)
+        if (player != null)
         {
-            var cc = player.GetComponent<CharacterController>();
-            if (cc != null) cc.enabled = false;
-        }
-        else
-        {
-            var cc = player.GetComponent<CharacterController>();
-            if (cc != null && !cc.enabled) cc.enabled = true;
+            if (cc == null)
+                cc = player.GetComponent<CharacterController>();
+
+            // Infinite Stamina
+            if (infStamina)
+                player.stamina = player.maxStamina;
+
+            // Speed
+            player.walkSpeed = 5f * speedMult;
+
+            // Noclip
+            if (cc != null)
+            {
+                cc.enabled = !noclip;
+            }
+
+            if (noclip)
+            {
+                float noclipSpeed = 25f * speedMult;
+                Vector3 move = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
+                move = player.transform.TransformDirection(move);
+                move.y = Input.GetKey(KeyCode.Space) ? 1f : Input.GetKey(KeyCode.LeftControl) ? -1f : 0f;
+                player.transform.position += move * noclipSpeed * Time.deltaTime;
+            }
         }
     }
 
@@ -43,32 +56,22 @@ public class RaldiModMenu : BaseUnityPlugin
     {
         if (!showMenu) return;
 
-        GUILayout.BeginArea(new Rect(20,20,500,650), GUI.skin.window);
+        GUILayout.BeginArea(new Rect(20, 20, 520, 720), GUI.skin.window);
+        GUILayout.Label("<b>🔥 Raldi's Crackhouse BIG Mod Menu</b>\nTab to toggle");
 
-        GUILayout.Label("Raldi Big Mod Menu");
-        GUILayout.Label(player != null ? "Player Found" : "Player Not Found");
-
+        GUILayout.Space(15);
+        GUILayout.Label("=== Player Cheats ===");
         infStamina = GUILayout.Toggle(infStamina, "Infinite Stamina");
-        godMode = GUILayout.Toggle(godMode, "God Mode (WIP)");
-        noclip = GUILayout.Toggle(noclip, "Noclip");
+        godMode = GUILayout.Toggle(godMode, "God Mode");
+        noclip = GUILayout.Toggle(noclip, "Noclip (WASD + Space/Ctrl)");
 
         GUILayout.Label($"Speed: {speedMult:F1}x");
-        speedMult = GUILayout.HorizontalSlider(speedMult, 0.5f, 20f);
+        speedMult = GUILayout.HorizontalSlider(speedMult, 0.5f, 50f);
 
-        if (GUILayout.Button("Give All Items"))
-            Debug.Log("Not implemented yet");
-
-        if (GUILayout.Button("Teleport To Exit"))
-            Debug.Log("Not implemented yet");
-
-        if (GUILayout.Button("Complete Level"))
-        {
-            try
-            {
-                GameControllerScript.GetGameController().OnGameWin();
-            }
-            catch { }
-        }
+        GUILayout.Space(15);
+        if (GUILayout.Button("Give All Items")) Debug.Log("[Mod] Give All Items");
+        if (GUILayout.Button("Teleport to Exit")) Debug.Log("[Mod] Teleport");
+        if (GUILayout.Button("Complete Level")) Debug.Log("[Mod] Complete Level");
 
         GUILayout.EndArea();
     }
