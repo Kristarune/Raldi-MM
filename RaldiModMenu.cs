@@ -31,7 +31,7 @@ public class RaldiModMenu : BaseUnityPlugin
             if (noclip)
             {
                 float speed = 25f * speedMult;
-                Vector3 move = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+                Vector3 move = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
                 move = player.transform.TransformDirection(move);
                 move.y = Input.GetKey(KeyCode.Space) ? 1f : Input.GetKey(KeyCode.LeftControl) ? -1f : 0f;
                 player.transform.position += move * speed * Time.deltaTime;
